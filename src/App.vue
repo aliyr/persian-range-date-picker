@@ -1,17 +1,16 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <persian-date-range-picker></persian-date-range-picker>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import PersianDateRangePicker from "./components/PersianDateRangePicker/PersianDateRangePicker";
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    PersianDateRangePicker
   }
 }
 </script>
