@@ -8,6 +8,19 @@ import PersianDate from "persian-date";
 export default {
   data() {
     return {
+      datetimePickerObj: {
+        year: 1398,
+        monthsArray: {
+          firstMonth: {
+            month: [],
+            days: []
+          },
+          secondMonth: {
+            month: [],
+            days: []
+          }
+        }
+      },
       MonthArray: []
     };
   },
@@ -20,12 +33,32 @@ export default {
       let currentDate = new PersianDate();
       let currentDateArray = [];
       let firstDayOfMonth = [];
-      currentDateArray[2] = this.fixPersianNumber(currentDate.format("D"));
-      currentDateArray[1] = this.fixPersianNumber(currentDate.format("M")) - 1;
-      currentDateArray[0] = this.fixPersianNumber(currentDate.format("YYYY"));
+      let firstDayOfNextMonth = [];
 
-      firstDayOfMonth = [currentDateArray[0], currentDateArray[1], "1"];
-      this.makeDaysOfMonth(firstDayOfMonth);
+      // make current date in an array
+      currentDateArray[2] = parseInt(this.fixPersianNumber(currentDate.format("D")));
+      currentDateArray[1] = parseInt(this.fixPersianNumber(currentDate.format("M")));
+      currentDateArray[0] = parseInt(this.fixPersianNumber(currentDate.format("YYYY")));
+
+      // store current year in the 'datetimePickerObj.year'
+      this.datetimePickerObj.year = currentDateArray[0];
+
+      // store current month and next month
+      firstDayOfMonth = [currentDateArray[0], currentDateArray[1], 1];
+
+      if (currentDateArray[1] === 12) {
+        firstDayOfNextMonth = [currentDateArray[0] + 1, 1 , 1];
+      } else{
+        firstDayOfNextMonth = [currentDateArray[0], currentDateArray[1] + 1, 1];
+      }
+
+
+      this.datetimePickerObj.monthsArray.firstMonth.days = this.makeDaysOfMonth(firstDayOfMonth);
+      this.datetimePickerObj.monthsArray.firstMonth.month = [currentDateArray[0], currentDateArray[1]];
+      this.datetimePickerObj.monthsArray.secondMonth.days = this.makeDaysOfMonth(firstDayOfNextMonth);
+      this.datetimePickerObj.monthsArray.secondMonth.month = [currentDateArray[0], currentDateArray[1] + 1];
+
+      debugger;
 
     },
     fixPersianNumber(str) {
@@ -63,20 +96,19 @@ export default {
       }
       return str;
     },
-    makeDaysOfMonth(startDate) {
-      const isLeapYear = new PersianDate(startDate).isLeapYear();
-      let daysOfMonth = this.getDaysOfMonth(startDate[1], isLeapYear);
+    makeDaysOfMonth(startDate) { // startDate example : [1398,11,1]
+      const isLeapYear = new PersianDate(startDate).isLeapYear(); // check if year is leap year
+      let daysOfMonth = this.getDaysOfMonth(startDate[1], isLeapYear); // get count of days in the month
+      let monthArray = [];
 
       for (let i = 1; i <= daysOfMonth; i++) {
         let dateObject = {};
         dateObject.isHoliday = false;
-        dateObject.date = [startDate[0], startDate[1], i.toString()];
+        dateObject.date = [startDate[0], startDate[1], i];
         dateObject.dayOfWeek = this.fixPersianNumber(new PersianDate(dateObject.date).format('d'));
-        this.MonthArray.push(dateObject);
-        debugger;
+        monthArray.push(dateObject);
       }
-      debugger;
-
+      return monthArray;
     },
     getDaysOfMonth(month, isLeapYear) {
       if (month < 7) {
